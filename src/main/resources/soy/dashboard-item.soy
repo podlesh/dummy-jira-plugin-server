@@ -5,5 +5,47 @@
  * @param version
  */
 {template .Static}
+    <div id="dynamic-content"/>
     <div>Welcome to <span class="aui-lozenge aui-lozenge-success">{$pluginName}</span> v{$version}!</div>
+{/template}
+
+/**
+  * @param issues
+  */
+{template .IssueList}
+    <table class="aui">
+        <thead>
+        <tr>
+            <th id="basic-icon"></th>
+            <th id="basic-fname">Issue key</th>
+            <th id="basic-lname">Due date</th>
+        </tr>
+        </thead>
+        <tbody>
+            {foreach $issue in $issues}
+            <tr>
+                <td headers="basic-number"><img src="{$issue.fields.issuetype.iconUrl}"/></td>
+                <td headers="basic-fname">{$issue.key}</td>
+                <td headers="basic-lname">{$issue.fields.duedate}</td>
+            </tr>
+            {/foreach}
+        </tbody>
+    </table>
+    <div class="buttons-container">
+        <div class="buttons">
+            <input class="button submit" type="submit" value="Refresh">
+        </div>
+    </div>
+{/template}
+
+/**
+ *   Use this template if there is no issues in response
+ */
+{template .Empty}
+    No issues yet.
+    <div class="buttons-container">
+        <div class="buttons">
+            <input class="button submit" type="submit" value="Refresh">
+        </div>
+    </div>
 {/template}

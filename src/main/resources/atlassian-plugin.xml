@@ -20,8 +20,8 @@
         <resource type="download" name="tutorial3.js" location="/js/tutorial3.js"/>
         <resource type="download" name="images/" location="/images"/>
         <resource type="soy" location="/soy/dashboard-item.soy" name="Dashboard.Item.Tutorial.Templates.Static"/>
-        <context>atl.dashboard</context>
-        <context>tutorial3</context>
+        <context>jira.general</context>
+        <!--<context>atl.dashboard</context>-->
     </web-resource>
     <gadget name="gadget1" i18n-name-key="gadget-1.name" key="gadget-1" location="gadgets/gadget-1/gadget.xml">
         <description key="gadget-1.description">The gadget1 Plugin</description>
@@ -40,6 +40,8 @@
         </definition>
         <resource name="view" type="soy" location=":tutorial3-resources/Dashboard.Item.Tutorial.Templates.Static"/>
         <context-provider class="com.podlesh.atlassian.DashboardItemContextProvider"/>
+
+        <amd-module>ExampleDashboardItem</amd-module>
 
     </dashboard-item>
 </atlassian-plugin>
