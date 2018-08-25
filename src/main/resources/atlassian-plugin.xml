@@ -13,12 +13,33 @@
     <!-- add our web resources -->
     <web-resource key="tutorial3-resources" name="tutorial3 Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <transformation extension="soy">
+            <transformer key="soyTransformer"/>
+        </transformation>
         <resource type="download" name="tutorial3.css" location="/css/tutorial3.css"/>
         <resource type="download" name="tutorial3.js" location="/js/tutorial3.js"/>
         <resource type="download" name="images/" location="/images"/>
+        <resource type="soy" location="/soy/dashboard-item.soy" name="Dashboard.Item.Tutorial.Templates.Static"/>
+        <context>atl.dashboard</context>
         <context>tutorial3</context>
     </web-resource>
     <gadget name="gadget1" i18n-name-key="gadget-1.name" key="gadget-1" location="gadgets/gadget-1/gadget.xml">
         <description key="gadget-1.description">The gadget1 Plugin</description>
     </gadget>
+    <dashboard-item name="Test Dashboard Item 1" key="di-1" i18n-name-key="di-1.name">
+        <description key="di-1.description">The tutorial3 plugin</description>
+        <definition>
+            <title key="${atlassian.plugin.key}.di1"/>
+            <categories>
+                <category>Jira</category>
+            </categories>
+            <author>
+                <name>Podlesh</name>
+            </author>
+            <thumbnail location="/download/resources/${atlassian.plugin.key}:tutorial3-resources/images/pluginLogo.png"/>
+        </definition>
+        <resource name="view" type="soy" location=":tutorial3-resources/Dashboard.Item.Tutorial.Templates.Static"/>
+        <context-provider class="com.podlesh.atlassian.DashboardItemContextProvider"/>
+
+    </dashboard-item>
 </atlassian-plugin>
