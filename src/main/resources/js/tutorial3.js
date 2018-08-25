@@ -18,10 +18,10 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
             self.issues = data.issues;
             console.log(JSON.stringify(data));
             if (self.issues === undefined || self.issues.length === 0) {
-                $element.empty().html("nothing");
+                $element.empty().html(Dashboard.Item.Tutorial.Templates.Empty());
             }
             else {
-                $element.empty().html("count: " + self.issues.length);
+                $element.empty().html(Dashboard.Item.Tutorial.Templates.IssueList({issues: self.issues}));
             }
             self.API.resize();
             $element.find(".submit").click(function (event) {

@@ -14,12 +14,15 @@
     <web-resource key="tutorial3-resources" name="tutorial3 Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
         <transformation extension="soy">
-            <transformer key="soyTransformer"/>
+            <transformer key="soyTransformer">
+                <functions>com.atlassian.confluence.plugins.soy:soy-core-functions</functions>
+            </transformer>
         </transformation>
         <resource type="download" name="tutorial3.css" location="/css/tutorial3.css"/>
         <resource type="download" name="tutorial3.js" location="/js/tutorial3.js"/>
         <resource type="download" name="images/" location="/images"/>
         <resource type="soy" location="/soy/dashboard-item.soy" name="Dashboard.Item.Tutorial.Templates.Static"/>
+        <resource type="download" name="Templates.soy.js" location="/soy/dashboard-item.soy"/>
         <context>jira.general</context>
         <!--<context>atl.dashboard</context>-->
     </web-resource>
