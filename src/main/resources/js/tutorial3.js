@@ -36,6 +36,13 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
         return $("<textarea/>").html(value).text();
     }
 
+    function propertiesValue(properties, key, defaultValue) {
+        var val = properties[key];
+        if (val) return htmlDecode(val);
+        if (defaultValue) return defaultValue;
+        return '';
+    }
+
     /**
      * Called to render the configuration.
      *
@@ -50,6 +57,10 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
         var $form = $("form", $element);
         var $error = $(".error", $form);
         $error.hide();
+
+        //fill current data
+        $("input[name='jql']", $form).attr('value', propertiesValue(preferences, 'jql'));
+
         $(".cancel", $form).click(_.bind(function () {
             if (preferences['jql'])
                 this.API.closeEdit();

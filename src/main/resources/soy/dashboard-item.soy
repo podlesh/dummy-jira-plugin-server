@@ -5,6 +5,7 @@
  * @param version
  */
 {template .Static}
+    <div id="aui-message-bar"></div>
     <div id="dynamic-content"/>
     <div>Welcome to <span class="aui-lozenge aui-lozenge-success">{$pluginName}</span> v{$version}!</div>
 {/template}
@@ -58,7 +59,21 @@
         <div class="error" style="display:none"></div>
         <div class='field-group'>
             <label for='inputJQL'>JQL:<span class='aui-icon icon-required'>required</span></label>
-            <input class='text medium-field' type='text' id='inputJQL' name="jql" value=''/>
+            <input class='text full-width-field' type='text' id='inputJQL' name="jql" value=''/>
+        </div>
+        <div class='field-group' style="display: none">
+            <label for='filterSelDiv'>Filter:</label>
+            <div id="filterSelDiv" class="aui-dropdown2 aui-style-default">
+                <ul class="aui-list-truncate" id="filterSel">
+                    <li><a href="http://example.com/">Lister</a></li>
+                    <li><a href="http://example.com/">Rimmer</a></li>
+                    <li><a href="http://example.com/">Cat</a></li>
+                    <li><a href="http://example.com/">Kryten</a></li>
+                </ul>
+            </div><!-- .aui-dropdown2 -->
+//            <select class="select" id="filterSel" name="filterSel" title="filter">
+//                <option>---</option>
+//            </select>
         </div>
         <div class='buttons-container'>
             <button type='submit' id='saveConfiguration' class='aui-button'>Set</button>
