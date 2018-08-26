@@ -49,3 +49,20 @@
         </div>
     </div>
 {/template}
+
+/**
+ * Configure the dashboard item.
+ */
+{template .Config}
+    <form class="aui">
+        <div class="error" style="display:none"></div>
+        <div class='field-group'>
+            <label for='inputJQL'>JQL:<span class='aui-icon icon-required'>required</span></label>
+            <input class='text medium-field' type='text' id='inputJQL' name="jql" value=''/>
+        </div>
+        <div class='buttons-container'>
+            <button type='submit' id='saveConfiguration' class='aui-button'>Set</button>
+            <a class="cancel" href="#">Cancel</a>
+        </div>
+    </form>
+{/template}

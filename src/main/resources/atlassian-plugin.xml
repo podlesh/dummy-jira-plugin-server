@@ -29,7 +29,7 @@
     <gadget name="gadget1" i18n-name-key="gadget-1.name" key="gadget-1" location="gadgets/gadget-1/gadget.xml">
         <description key="gadget-1.description">The gadget1 Plugin</description>
     </gadget>
-    <dashboard-item name="Test Dashboard Item 1" key="di-1" i18n-name-key="di-1.name">
+    <dashboard-item name="Test Dashboard Item 1" key="di-1" i18n-name-key="di-1.name" configurable="true">
         <description key="di-1.description">The tutorial3 plugin</description>
         <definition>
             <title key="${atlassian.plugin.key}.di1"/>
