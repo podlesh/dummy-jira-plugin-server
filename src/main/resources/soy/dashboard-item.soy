@@ -61,14 +61,15 @@
             <label for='inputJQL'>JQL:<span class='aui-icon icon-required'>required</span></label>
             <input class='text full-width-field' type='text' id='inputJQL' name="jql" value=''/>
         </div>
-        <div class='field-group' style="display: none">
-            <label for='filterSelDiv'>Filter:</label>
-            <div id="filterSelDiv" class="aui-dropdown2 aui-style-default">
+        <div id="filterSelSection" class='field-group'>
+            <a href="#filterSelDropdown" aria-owns="filterSelDropdown" aria-haspopup="true" class="aui-button aui-dropdown2-trigger aui-style-default"
+            >Filter</a>
+            <div id="filterSelDropdown" class="aui-dropdown2 aui-style-default">
                 <ul class="aui-list-truncate" id="filterSel">
-                    <li><a href="http://example.com/">Lister</a></li>
-                    <li><a href="http://example.com/">Rimmer</a></li>
-                    <li><a href="http://example.com/">Cat</a></li>
-                    <li><a href="http://example.com/">Kryten</a></li>
+                    <li><a href="#filterSelDropdown">Lister</a></li>
+                    <li><a href="#filterSelDropdown">Rimmer</a></li>
+                    <li><a href=#filterSelDropdown>Cat</a></li>
+                    <li><a href="#filterSelDropdown">Kryten</a></li>
                 </ul>
             </div><!-- .aui-dropdown2 -->
 //            <select class="select" id="filterSel" name="filterSel" title="filter">

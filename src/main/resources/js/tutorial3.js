@@ -55,11 +55,35 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
         this.API.once("afterRender", this.API.resize);
         var self = this;
         var $form = $("form", $element);
-        var $error = $(".error", $form);
-        $error.hide();
 
         //fill current data
         $("input[name='jql']", $form).attr('value', propertiesValue(preferences, 'jql'));
+
+        var filterSelUl = $("#filterSel", $form);
+
+        //fill the filters
+        $.ajax({
+            method: "GET",
+            url: contextPath() + "/rest/api/2/filter/favourite"
+        }).then(function (data) {
+            $("li", filterSelUl).remove();
+            if (data.length < 1) {
+                // $("#filterSelSection", $form).hide();
+            } else {
+                // $("#filterSelSection", $form).show();
+                _.each(data, function (filter) {
+                    filterSelUl.append(
+                        $("<li>").append(
+                            $("<a>", {href: "#" + filter.id})
+                                .text(filter.name)
+                                .click(_.bind(function () {
+                                    alert(filter.id);
+                                }, this))
+                        )
+                    );
+                });
+            }
+        });
 
         $(".cancel", $form).click(_.bind(function () {
             if (preferences['jql'])
@@ -79,8 +103,9 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
                 }, function (jqXHR, textStatus, errorThrown) {
                     self.API.hideLoadingBar();
                     //display an error
-                    $error.empty().text("Invalid JQL: " + errorThrown + " / " + textStatus);
-                    $error.show();
+                    AJS.messages.error({
+                        title: "Invalid JQL"
+                    });
                 });
             }
         }, this));
