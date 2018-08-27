@@ -13,7 +13,10 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
         this.API.showLoadingBar();
         var $element = this.$element = $(context).find("#dynamic-content");
         var self = this;
-        this.requestData(htmlDecode(preferences['jql'])).done(function (data) {
+
+        var filterId = propertiesValue(preferences, 'filterId');
+
+        this.requestData(propertiesValue(preferences, 'jql')).done(function (data) {
             self.API.hideLoadingBar();
             self.issues = data.issues;
             if (self.issues === undefined || self.issues.length === 0) {
@@ -56,10 +59,15 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
         var self = this;
         var $form = $("form", $element);
 
+        var inputJQL = $("input[name='jql']", $form);
+        var inputFilterId = $("input[name='filterId']", $form);
+
         //fill current data
-        $("input[name='jql']", $form).attr('value', propertiesValue(preferences, 'jql'));
+        inputJQL.attr('value', propertiesValue(preferences, 'jql'));
+        inputFilterId.attr('value', propertiesValue(preferences, 'filterId'));
 
         var filterSelUl = $("#filterSel", $form);
+        var filters = {};
 
         //fill the filters
         $.ajax({
@@ -72,12 +80,14 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
             } else {
                 // $("#filterSelSection", $form).show();
                 _.each(data, function (filter) {
+                    filters[filter.id] = filter['jql'];
                     filterSelUl.append(
                         $("<li>").append(
                             $("<a>", {href: "#" + filter.id})
                                 .text(filter.name)
                                 .click(_.bind(function () {
-                                    alert(filter.id);
+                                    inputJQL.attr('value', filter.jql);
+                                    inputFilterId.attr('value', filter.id);
                                 }, this))
                         )
                     );
@@ -93,10 +103,17 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
             event.preventDefault();
 
             var preferences = getPreferencesFromForm($form);
-            if (preferences['jql']) {
+            var newJql = preferences['jql'];
+            if (newJql) {
+                if (_.has(preferences, 'filterId')) {
+                    if (!_.has(filters, preferences.filterId) || filters[preferences.filterId] !== newJql) {
+                        delete preferences.filterId;
+                    }
+                }
                 //do the request once, for validation
                 this.API.showLoadingBar();
-                this.requestData(preferences['jql']).then(function () {
+                // noinspection JSUnusedLocalSymbols
+                this.requestData(newJql).then(function () {
                     //ok, good
                     self.API.savePreferences(preferences);
                     self.API.hideLoadingBar();
@@ -106,6 +123,7 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
                     AJS.messages.error({
                         title: "Invalid JQL"
                     });
+                    self.API.once("afterRender", self.API.resize);
                 });
             }
         }, this));
@@ -116,7 +134,11 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
         var preferencesObject = {};
 
         preferencesArray.forEach(function (element) {
-            preferencesObject[element.name] = element.value;
+            var value = element.value;
+            if (element.name.endsWith('Id')) {
+                value = parseInt(value);
+            }
+            preferencesObject[element.name] = value;
         });
 
         console.log("preferences from form: " + JSON.stringify(preferencesObject));
