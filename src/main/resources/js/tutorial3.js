@@ -14,21 +14,48 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
         var $element = this.$element = $(context).find("#dynamic-content");
         var self = this;
 
-        var filterId = propertiesValue(preferences, 'filterId');
+        var usedFilterData = undefined;
 
-        this.requestData(propertiesValue(preferences, 'jql')).done(function (data) {
+        var filterId = propertiesValue(preferences, 'filterId');
+        var configuredJql = propertiesValue(preferences, 'jql');
+        var jql;
+        if (_.isNumber(filterId) || (_.isString(filterId) && filterId.match('^[0-9]+$'))) {
+            filterId = parseInt(filterId);
+            //note: jquery in JIRA is quite old and does not properly chain promises --> create new ES promise
+            jql = new Promise(function (resolve, reject) {
+                $.ajax({
+                    method: "GET",
+                    url: contextPath() + "/rest/api/2/filter/" + filterId
+                }).then(function (data) {
+                    usedFilterData = data;
+                    resolve(data.jql);
+                }, function () {
+                    reject(configuredJql);
+                });
+            });
+        } else {
+            jql = Promise.resolve(configuredJql);
+        }
+
+        jql.then(self.requestData).then(function (data) {
             self.API.hideLoadingBar();
             self.issues = data.issues;
+            var newHtml = "";
+            if (_.isObject(usedFilterData)) {
+                newHtml += Dashboard.Item.Tutorial.Templates.FilterName({name:usedFilterData.name});
+            }
             if (self.issues === undefined || self.issues.length === 0) {
-                $element.empty().html(Dashboard.Item.Tutorial.Templates.Empty());
+                newHtml += Dashboard.Item.Tutorial.Templates.Empty();
+                $element.empty().html(newHtml);
             }
             else {
-                $element.empty().html(Dashboard.Item.Tutorial.Templates.IssueList({issues: self.issues}));
+                newHtml += Dashboard.Item.Tutorial.Templates.IssueList({issues: self.issues});
             }
+            $element.empty().html(newHtml);
             self.API.resize();
             $element.find(".submit", $element).click(function (event) {
                 event.preventDefault();
-                self.render($element, preferences);
+                self.render(context, preferences);
             });
         });
 

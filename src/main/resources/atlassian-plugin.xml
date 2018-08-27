@@ -32,7 +32,7 @@
     <dashboard-item name="Test Dashboard Item 1" key="di-1" i18n-name-key="di-1.name" configurable="true">
         <description key="di-1.description">The tutorial3 plugin</description>
         <definition>
-            <title key="${atlassian.plugin.key}.di1"/>
+            <title key="${atlassian.plugin.key}"/>
             <categories>
                 <category>Jira</category>
             </categories>
