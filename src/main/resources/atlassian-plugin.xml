@@ -47,4 +47,7 @@
         <amd-module>DashboardItem</amd-module>
 
     </dashboard-item>
+    <rest name="Roadmap Plugin rest API" key="rp-rest-resource" path="/roadmap-plugin" version="1.0">
+        <description>Roadmap Plugin</description>
+    </rest>
 </atlassian-plugin>

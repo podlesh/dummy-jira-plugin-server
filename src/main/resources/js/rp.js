@@ -57,6 +57,15 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
                 event.preventDefault();
                 self.render(context, preferences);
             });
+            $("input[name='restdemo']", $element).click(function () {
+                $.ajax({
+                    url: contextPath() + "/rest/roadmap-plugin/1.0/message/hello?name=world",
+                    type: "GET",
+                    dataType: "json"
+                }).then(function (data) {
+                    alert(JSON.stringify(data));
+                });
+            });
         });
 
         this.API.once("afterRender", this.API.resize);
