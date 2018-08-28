@@ -13,6 +13,7 @@
     <!-- add our web resources -->
     <web-resource key="rp-resources" name="Roadmap Planner Web Resources">
         <dependency>com.atlassian.auiplugin:ajs</dependency>
+        <dependency>com.atlassian.auiplugin:aui-select</dependency>
         <transformation extension="soy">
             <transformer key="soyTransformer">
                 <functions>com.atlassian.confluence.plugins.soy:soy-core-functions</functions>

@@ -42,7 +42,7 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
             self.issues = data.issues;
             var newHtml = "";
             if (_.isObject(usedFilterData)) {
-                newHtml += Dashboard.Item.Templates.FilterName({name:usedFilterData.name});
+                newHtml += Dashboard.Item.Templates.FilterName({name: usedFilterData.name});
             }
             if (self.issues === undefined || self.issues.length === 0) {
                 newHtml += Dashboard.Item.Templates.Empty();
@@ -90,7 +90,7 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
      */
     DashboardItem.prototype.renderEdit = function (context, preferences) {
         var $element = this.$element = $(context).find("#dynamic-content");
-        $element.empty().html(Dashboard.Item.Templates.Config());
+        $element.empty().html(Dashboard.Item.Templates.Config({contextPath: contextPath()}));
         this.API.once("afterRender", this.API.resize);
         var self = this;
         var $form = $("form", $element);

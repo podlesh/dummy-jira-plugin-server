@@ -62,6 +62,7 @@
 
 /**
  * Configure the dashboard item.
+ * @param contextPath
  */
 {template .Config}
     <form class="aui">
@@ -86,6 +87,19 @@
 //                <option>---</option>
 //            </select>
         </div>
+
+        <div class="field-group">
+            <aui-label for="async-filter-single-select">Choose your product asynchronously (you need to type to initiate a search):</aui-label>
+            <p>
+                <aui-select
+                        id="async-filter-single-select"
+                        name="filter"
+                        placeholder="Select a saved filter"
+                        src="{$contextPath}/rest/roadmap-plugin/1.0/filters/autocomplete"
+                        value="type to trigger async"
+                ></aui-select>
+        </div>
+
         <div class='buttons-container'>
             <button type='submit' id='saveConfiguration' class='aui-button'>Set</button>
             <a class="cancel" href="#">Cancel</a>
