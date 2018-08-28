@@ -1,4 +1,4 @@
-define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (_, $, contextPath) {
+define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (_, $, contextPath) {
     var DashboardItem = function (API) {
         this.API = API;
         this.issues = [];
@@ -42,14 +42,14 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
             self.issues = data.issues;
             var newHtml = "";
             if (_.isObject(usedFilterData)) {
-                newHtml += Dashboard.Item.Tutorial.Templates.FilterName({name:usedFilterData.name});
+                newHtml += Dashboard.Item.Templates.FilterName({name:usedFilterData.name});
             }
             if (self.issues === undefined || self.issues.length === 0) {
-                newHtml += Dashboard.Item.Tutorial.Templates.Empty();
+                newHtml += Dashboard.Item.Templates.Empty();
                 $element.empty().html(newHtml);
             }
             else {
-                newHtml += Dashboard.Item.Tutorial.Templates.IssueList({issues: self.issues});
+                newHtml += Dashboard.Item.Templates.IssueList({issues: self.issues});
             }
             $element.empty().html(newHtml);
             self.API.resize();
@@ -81,7 +81,7 @@ define('ExampleDashboardItem', ['underscore', 'jquery', 'wrm/context-path'], fun
      */
     DashboardItem.prototype.renderEdit = function (context, preferences) {
         var $element = this.$element = $(context).find("#dynamic-content");
-        $element.empty().html(Dashboard.Item.Tutorial.Templates.Config());
+        $element.empty().html(Dashboard.Item.Templates.Config());
         this.API.once("afterRender", this.API.resize);
         var self = this;
         var $form = $("form", $element);

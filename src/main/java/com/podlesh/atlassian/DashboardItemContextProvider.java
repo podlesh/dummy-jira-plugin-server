@@ -29,7 +29,7 @@ public class DashboardItemContextProvider implements ContextProvider {
     @Override
     public Map<String, Object> getContextMap(final Map<String, Object> context) {
         final Map<String, Object> newContext = new HashMap<>(context);
-        Plugin plugin = pluginAccessor.getEnabledPlugin("com.podlesh.atlassian.tutorial3-tests");
+        Plugin plugin = pluginAccessor.getEnabledPlugin("com.podlesh.atlassian.jira.jira-roadmap-planner");
         newContext.put("version", plugin.getPluginInformation().getVersion());
         newContext.put("pluginName", plugin.getName());
         return newContext;
