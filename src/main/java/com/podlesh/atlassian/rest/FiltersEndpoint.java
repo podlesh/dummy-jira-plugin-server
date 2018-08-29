@@ -7,10 +7,12 @@ import com.atlassian.jira.bc.filter.SearchRequestService;
 import com.atlassian.jira.component.ComponentAccessor;
 import com.atlassian.jira.issue.search.SearchRequest;
 import com.atlassian.jira.security.JiraAuthenticationContext;
+import com.atlassian.jira.sharing.SharedEntityColumn;
 import com.atlassian.jira.sharing.search.SharedEntitySearchContext;
 import com.atlassian.jira.sharing.search.SharedEntitySearchParameters;
 import com.atlassian.jira.sharing.search.SharedEntitySearchParametersBuilder;
 import com.atlassian.jira.sharing.search.SharedEntitySearchResult;
+import com.google.gson.Gson;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -22,9 +24,9 @@ import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 /**
@@ -33,16 +35,27 @@ import java.util.stream.Collectors;
 @Path("/filters")
 public class FiltersEndpoint {
 
+    protected static final Gson GSON = new Gson();
+
     @GET
     @Produces({MediaType.APPLICATION_JSON})
     public Response filters(@QueryParam("q") String searchFor) {
         SharedEntitySearchResult<SearchRequest> searchResult = findFilters(searchFor);
 
-        final Map<Long, SearchRequest> result = new TreeMap<>();
-        for (SearchRequest rslt : searchResult.getResults()) {
-            result.put(rslt.getId(), rslt);
-        }
-        return Response.ok(result).build();
+        return Response.ok(
+                searchResult.getResults().stream().map(this::convertToDefaultJson).collect(Collectors.toList())
+        ).build();
+    }
+
+    protected Map<String, Object> convertToDefaultJson(SearchRequest sr) {
+        final Map<String, Object> map = new LinkedHashMap<>();
+        map.put("id", sr.getId());
+        map.put("name", sr.getName());
+        map.put("description", sr.getDescription());
+        map.put("jql", sr.getQuery().getQueryString());
+        map.put("favouriteCount", sr.getFavouriteCount());
+        map.put("ownerName", sr.getOwnerUserName());
+        return map;
     }
 
     @GET
@@ -59,11 +72,12 @@ public class FiltersEndpoint {
 
     protected SharedEntitySearchResult<SearchRequest> findFilters(@QueryParam("q") String searchFor) {
         SharedEntitySearchParametersBuilder builder = new SharedEntitySearchParametersBuilder()
+                .setSortColumn(SharedEntityColumn.FAVOURITE_COUNT, false)
                 .setEntitySearchContext(SharedEntitySearchContext.USE);
         if (searchFor != null && !searchFor.trim().isEmpty()) {
             builder.setName(searchFor);
             builder.setDescription(searchFor);
-            builder.setTextSearchMode(SharedEntitySearchParameters.TextSearchMode.WILDCARD);
+            builder.setTextSearchMode(SharedEntitySearchParameters.TextSearchMode.OR);
         }
         SharedEntitySearchParameters searchParameters = builder
                 .toSearchParameters();

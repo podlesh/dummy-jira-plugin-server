@@ -96,8 +96,11 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
         //fill the filters
         $.ajax({
             method: "GET",
-            url: contextPath() + "/rest/api/2/filter/favourite"
+            url: contextPath() + "/rest/roadmap-plugin/1.0/filters"
         }).then(function (data) {
+            _.each(data, function(filter) {
+                seenFilters[filter.id] = filter.jql;
+            });
             var $section = $("#filterSelSection", $form);
             $section.empty().html(Dashboard.Item.Templates.FilterSelector({
                 contextPath: contextPath(),
@@ -108,7 +111,6 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
             var $filterIdSelect = $("#filterIdSelect", $section);
             var changeHandler = function() {
                 var filterId = $filterIdSelect.val();
-                console.log("selected value: " + filterId);
                 if (filterId && filterId > 0) {
                     filterId = parseInt(filterId);
                     $inputJQL.prop('disabled', true);
