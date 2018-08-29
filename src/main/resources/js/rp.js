@@ -107,9 +107,8 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
             $section.show();
             var $filterIdSelect = $("#filterIdSelect", $section);
             var changeHandler = function() {
-                var filterId = $filterIdSelect.prop('value');
+                var filterId = $filterIdSelect.val();
                 console.log("selected value: " + filterId);
-                console.log("selected value II: " + $filterIdSelect.val());
                 if (filterId && filterId > 0) {
                     filterId = parseInt(filterId);
                     $inputJQL.prop('disabled', true);
