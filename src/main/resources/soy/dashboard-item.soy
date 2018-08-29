@@ -61,8 +61,33 @@
 {/template}
 
 /**
- * Configure the dashboard item.
  * @param contextPath
+ * @param filters
+ * @param selectedFilterId
+ */
+{template .FilterSelector}
+    <aui-label for="filterIdSelect">Filter:</aui-label>
+    <aui-select
+            id="filterIdSelect"
+            name="filterId"
+            placeholder="Select a saved filter"
+            src="{$contextPath}/rest/roadmap-plugin/1.0/filters/autocomplete"
+            value="type to trigger async"
+            no-empty-values="false"
+    >
+        <aui-option value="-1"
+                    {if not $selectedFilterId}selected{/if}
+        >none (ad-hoc query)</aui-option>
+        {foreach $filter in $filters}
+            <aui-option value="{$filter.id}"
+                        {if $filter.id==$selectedFilterId}selected{/if}
+            >{$filter.name}</aui-option>
+        {/foreach}
+    </aui-select>
+{/template}
+
+/**
+ * Configure the dashboard item.
  */
 {template .Config}
     <form class="aui">
@@ -72,32 +97,8 @@
             <input class='text long-field' type='text' id='inputJQL' name="jql" value=''/>
             <input type='hidden' name="filterId" value=''/>
         </div>
-        <div id="filterSelSection" class='field-group'>
-            <a href="#filterSelDropdown" aria-owns="filterSelDropdown" aria-haspopup="true" class="aui-button aui-dropdown2-trigger aui-style-default"
-            >Filter</a>
-            <div id="filterSelDropdown" class="aui-dropdown2 aui-style-default">
-                <ul class="aui-list-truncate" id="filterSel">
-                    <li><a href="#filterSelDropdown">Lister</a></li>
-                    <li><a href="#filterSelDropdown">Rimmer</a></li>
-                    <li><a href=#filterSelDropdown>Cat</a></li>
-                    <li><a href="#filterSelDropdown">Kryten</a></li>
-                </ul>
-            </div><!-- .aui-dropdown2 -->
-//            <select class="select" id="filterSel" name="filterSel" title="filter">
-//                <option>---</option>
-//            </select>
-        </div>
 
-        <div class="field-group">
-            <aui-label for="async-filter-single-select">Choose your product asynchronously (you need to type to initiate a search):</aui-label>
-            <p>
-                <aui-select
-                        id="async-filter-single-select"
-                        name="filter"
-                        placeholder="Select a saved filter"
-                        src="{$contextPath}/rest/roadmap-plugin/1.0/filters/autocomplete"
-                        value="type to trigger async"
-                ></aui-select>
+        <div id="filterSelSection" class="field-group" style="display: none">
         </div>
 
         <div class='buttons-container'>

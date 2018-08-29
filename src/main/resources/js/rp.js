@@ -20,18 +20,8 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
         var configuredJql = propertiesValue(preferences, 'jql');
         var jql;
         if (_.isNumber(filterId) || (_.isString(filterId) && filterId.match('^[0-9]+$'))) {
-            filterId = parseInt(filterId);
-            //note: jquery in JIRA is quite old and does not properly chain promises --> create new ES promise
-            jql = new Promise(function (resolve, reject) {
-                $.ajax({
-                    method: "GET",
-                    url: contextPath() + "/rest/api/2/filter/" + filterId
-                }).then(function (data) {
-                    usedFilterData = data;
-                    resolve(data.jql);
-                }, function () {
-                    reject(configuredJql);
-                });
+            jql = self.fetchFilterJql(filterId).then(function (data) {
+                return usedFilterData = data;
             });
         } else {
             jql = Promise.resolve(configuredJql);
@@ -90,45 +80,51 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
      */
     DashboardItem.prototype.renderEdit = function (context, preferences) {
         var $element = this.$element = $(context).find("#dynamic-content");
-        $element.empty().html(Dashboard.Item.Templates.Config({contextPath: contextPath()}));
+        $element.empty().html(Dashboard.Item.Templates.Config());
         this.API.once("afterRender", this.API.resize);
         var self = this;
         var $form = $("form", $element);
 
-        var inputJQL = $("input[name='jql']", $form);
-        var inputFilterId = $("input[name='filterId']", $form);
+        var $inputJQL = $("input[name='jql']", $form);
 
         //fill current data
-        inputJQL.attr('value', propertiesValue(preferences, 'jql'));
-        inputFilterId.attr('value', propertiesValue(preferences, 'filterId'));
+        $inputJQL.val(propertiesValue(preferences, 'jql'));
 
-        var filterSelUl = $("#filterSel", $form);
-        var filters = {};
+        var oldFilterId = propertiesValue(preferences, 'filterId');
+        var seenFilters = {};
 
         //fill the filters
         $.ajax({
             method: "GET",
             url: contextPath() + "/rest/api/2/filter/favourite"
         }).then(function (data) {
-            $("li", filterSelUl).remove();
-            if (data.length < 1) {
-                // $("#filterSelSection", $form).hide();
-            } else {
-                // $("#filterSelSection", $form).show();
-                _.each(data, function (filter) {
-                    filters[filter.id] = filter['jql'];
-                    filterSelUl.append(
-                        $("<li>").append(
-                            $("<a>", {href: "#" + filter.id})
-                                .text(filter.name)
-                                .click(_.bind(function () {
-                                    inputJQL.attr('value', filter.jql);
-                                    inputFilterId.attr('value', filter.id);
-                                }, this))
-                        )
-                    );
-                });
-            }
+            var $section = $("#filterSelSection", $form);
+            $section.empty().html(Dashboard.Item.Templates.FilterSelector({
+                contextPath: contextPath(),
+                filters: data,
+                selectedFilterId: oldFilterId
+            }));
+            $section.show();
+            var $filterIdSelect = $("#filterIdSelect", $section);
+            var changeHandler = function() {
+                var filterId = $filterIdSelect.prop('value');
+                console.log("selected value: " + filterId);
+                console.log("selected value II: " + $filterIdSelect.val());
+                if (filterId && filterId > 0) {
+                    filterId = parseInt(filterId);
+                    $inputJQL.prop('disabled', true);
+                    (_.has(seenFilters, filterId) ? Promise.resolve(seenFilters[filterId]) : self.fetchFilterJql(filterId))
+                        .then(function (jql) {
+                            seenFilters[filterId] = jql;
+                            $inputJQL.val(jql);
+                        });
+                } else {
+                    $inputJQL.prop('disabled', false);
+                }
+            };
+            $filterIdSelect.change(changeHandler);
+            self.API.resize();
+            changeHandler();
         });
 
         $(".cancel", $form).click(_.bind(function () {
@@ -139,13 +135,15 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
             event.preventDefault();
 
             var preferences = getPreferencesFromForm($form);
+            if (_.has(preferences, 'filterId')) {
+                if (preferences.filterId <= 0) {
+                    delete preferences.filterId;
+                } else if (_.has(seenFilters, preferences.filterId)) {
+                    preferences['jql'] = seenFilters[preferences.filterId];
+                }
+            }
             var newJql = preferences['jql'];
             if (newJql) {
-                if (_.has(preferences, 'filterId')) {
-                    if (!_.has(filters, preferences.filterId) || filters[preferences.filterId] !== newJql) {
-                        delete preferences.filterId;
-                    }
-                }
                 //do the request once, for validation
                 this.API.showLoadingBar();
                 // noinspection JSUnusedLocalSymbols
@@ -188,6 +186,23 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
             url: contextPath() + "/rest/api/2/search?jql=" + encodeURIComponent(jql)
         });
     };
+
+    DashboardItem.prototype.fetchFilterJql = function (filterId, fallbackValue) {
+        filterId = parseInt(filterId);
+        //note: jquery in JIRA is quite old and does not properly chain promises --> create new ES promise
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                method: "GET",
+                url: contextPath() + "/rest/api/2/filter/" + filterId
+            }).then(function (data) {
+                usedFilterData = data;
+                resolve(data.jql);
+            }, function () {
+                reject(fallbackValue);
+            });
+        });
+    };
+
 
     return DashboardItem;
 });
