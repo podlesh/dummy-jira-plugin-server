@@ -49,7 +49,7 @@ public class FiltersEndpoint {
     @Produces({MediaType.APPLICATION_JSON})
     @Path("autocomplete")
     public Response autocomplete(@QueryParam("q") String searchFor) {
-        SharedEntitySearchResult<SearchRequest> searchResult = findFilters(null);
+        SharedEntitySearchResult<SearchRequest> searchResult = findFilters(searchFor);
 
         final List<AutocompleteItem> result = searchResult.getResults().stream()
                 .map(sr -> new AutocompleteItem(sr.getId(), sr.getName()))
@@ -81,25 +81,25 @@ public class FiltersEndpoint {
     @XmlAccessorType(XmlAccessType.FIELD)
     public static class AutocompleteItem {
         @XmlElement
-        private Long id;
+        private Long value;
         @XmlElement
         private String label;
         @XmlElement(name = "img-src")
         private String img;
 
-        public AutocompleteItem(String label, Long id, String img) {
+        public AutocompleteItem(String label, Long value, String img) {
             this.label = label;
-            this.id = id;
+            this.value = value;
             this.img = img;
         }
 
-        public AutocompleteItem(Long id, String label) {
-            this.id = id;
+        public AutocompleteItem(Long value, String label) {
+            this.value = value;
             this.label = label;
         }
 
-        public Long getId() {
-            return id;
+        public Long getValue() {
+            return value;
         }
 
         public String getLabel() {
