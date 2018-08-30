@@ -11,51 +11,40 @@
 {/template}
 
 /**
-  * @param name
-  */
-{template .FilterName}
-    <div id="filterName">Filter <span class="aui-lozenge aui-lozenge-success">{$name}</span></div>
-{/template}
-
-
-/**
   * @param issues
+  * @param filterName
   */
 {template .IssueList}
-    <table class="aui">
-        <thead>
-        <tr>
-            <th id="basic-icon"></th>
-            <th id="basic-fname">Issue key</th>
-            <th id="basic-lname">Due date</th>
-        </tr>
-        </thead>
-        <tbody>
-            {foreach $issue in $issues}
+    {if isNonnull($issues) and length($issues) > 0}
+        <table class="aui">
+            <thead>
             <tr>
-                <td headers="basic-number"><img src="{$issue.fields.issuetype.iconUrl}"/></td>
-                <td headers="basic-fname">{$issue.key}</td>
-                <td headers="basic-lname">{$issue.fields.duedate}</td>
+                <th id="basic-icon"></th>
+                <th id="basic-fname">Issue key</th>
+                <th id="basic-lname">Due date</th>
             </tr>
-            {/foreach}
-        </tbody>
-    </table>
-    <div class="buttons-container">
-        <div class="buttons">
-            <input class="button submit" type="submit" value="Refresh">
-            <input class="button" name="restdemo" type="button" value="REST demo">
+            </thead>
+            <tbody>
+                {foreach $issue in $issues}
+                <tr>
+                    <td headers="basic-number"><img src="{$issue.fields.issuetype.iconUrl}"/></td>
+                    <td headers="basic-fname">{$issue.key}</td>
+                    <td headers="basic-lname">{$issue.fields.duedate}</td>
+                </tr>
+                {/foreach}
+            </tbody>
+        </table>
+    {else}
+        No issues yet.
+    {/if}
+    <div class="aui-group aui-group-split">
+        <div class="aui-item">
+            {if isNonnull($filterName)}
+                Filter <span class="aui-lozenge aui-lozenge-success">{$filterName}</span>
+            {/if}
         </div>
-    </div>
-{/template}
-
-/**
- *   Use this template if there is no issues in response
- */
-{template .Empty}
-    No issues yet.
-    <div class="buttons-container">
-        <div class="buttons">
-            <input class="button submit" type="submit" value="Refresh">
+        <div class="aui-item">
+            <button id="refreshButton" class="aui-button">Refresh</button>
         </div>
     </div>
 {/template}

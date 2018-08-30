@@ -20,8 +20,9 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
         var configuredJql = propertiesValue(preferences, 'jql');
         var jql;
         if (_.isNumber(filterId) || (_.isString(filterId) && filterId.match('^[0-9]+$'))) {
-            jql = self.fetchFilterJql(filterId).then(function (data) {
-                return usedFilterData = data;
+            jql = self.fetchFilterData(filterId).then(function (data) {
+                usedFilterData = data;
+                return data.jql;
             });
         } else {
             jql = Promise.resolve(configuredJql);
@@ -30,31 +31,15 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
         jql.then(self.requestData).then(function (data) {
             self.API.hideLoadingBar();
             self.issues = data.issues;
-            var newHtml = "";
-            if (_.isObject(usedFilterData)) {
-                newHtml += Dashboard.Item.Templates.FilterName({name: usedFilterData.name});
-            }
-            if (self.issues === undefined || self.issues.length === 0) {
-                newHtml += Dashboard.Item.Templates.Empty();
-                $element.empty().html(newHtml);
-            }
-            else {
-                newHtml += Dashboard.Item.Templates.IssueList({issues: self.issues});
-            }
+            var newHtml = Dashboard.Item.Templates.IssueList({
+                issues: self.issues,
+                filterName: _.isObject(usedFilterData) ? usedFilterData.name : null
+            });
             $element.empty().html(newHtml);
             self.API.resize();
-            $element.find(".submit", $element).click(function (event) {
+            $element.find("#refreshButton", $element).click(function (event) {
                 event.preventDefault();
                 self.render(context, preferences);
-            });
-            $("input[name='restdemo']", $element).click(function () {
-                $.ajax({
-                    url: contextPath() + "/rest/roadmap-plugin/1.0/message/hello?name=world",
-                    type: "GET",
-                    dataType: "json"
-                }).then(function (data) {
-                    alert(JSON.stringify(data));
-                });
             });
         });
 
@@ -114,7 +99,10 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
                 if (filterId && filterId > 0) {
                     filterId = parseInt(filterId);
                     $inputJQL.prop('disabled', true);
-                    (_.has(seenFilters, filterId) ? Promise.resolve(seenFilters[filterId]) : self.fetchFilterJql(filterId))
+                    (_.has(seenFilters, filterId) ? Promise.resolve(seenFilters[filterId])
+                        : self.fetchFilterData(filterId).then(function (data) {
+                            return data.jql;
+                        }))
                         .then(function (jql) {
                             seenFilters[filterId] = jql;
                             $inputJQL.val(jql);
@@ -158,6 +146,7 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
                     AJS.messages.error({
                         title: "Invalid JQL"
                     });
+                    self.API.resize();
                     self.API.once("afterRender", self.API.resize);
                 });
             }
@@ -188,7 +177,7 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
         });
     };
 
-    DashboardItem.prototype.fetchFilterJql = function (filterId, fallbackValue) {
+    DashboardItem.prototype.fetchFilterData = function (filterId, fallbackValue) {
         filterId = parseInt(filterId);
         //note: jquery in JIRA is quite old and does not properly chain promises --> create new ES promise
         return new Promise(function (resolve, reject) {
@@ -196,8 +185,7 @@ define('DashboardItem', ['underscore', 'jquery', 'wrm/context-path'], function (
                 method: "GET",
                 url: contextPath() + "/rest/api/2/filter/" + filterId
             }).then(function (data) {
-                usedFilterData = data;
-                resolve(data.jql);
+                resolve(data);
             }, function () {
                 reject(fallbackValue);
             });
